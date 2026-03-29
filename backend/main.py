@@ -3,6 +3,7 @@ from db.database import engine, Base, sessionLocal
 from db.models import Todo
 from pydantic import BaseModel
 from sqlalchemy import delete
+from fastapi.middleware.cors import CORSMiddleware
 
 Base.metadata.create_all(bind= engine)
 
@@ -11,6 +12,11 @@ class CreateTodo(BaseModel):
     state : bool
 
 app = FastAPI()
+app.add_middleware(CORSMiddleware,
+                   allow_origins = ["*"],
+                   allow_methods = ["*"],
+                   allow_headers = ["*"],
+                   allow_credentials = True)
 
 def get_db():
     db = sessionLocal()
