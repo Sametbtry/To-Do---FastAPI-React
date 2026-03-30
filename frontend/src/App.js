@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import axios from "axios"
 
+// Backend API temel adresi.
 const API_BASE = "http://localhost:8000";
 
 function App() {
 
+  // Form, liste, guncelleme ve hata durum state'leri.
   const[baslik, setBaslik] =  useState("")
   const[bool, setBool] =  useState(false)
   const[todos, setTodos] =  useState([])
   const[duzenleState, setDuzenleState] = useState({})
   const[hata, setHata] = useState("")
 
+  // Yeni todo kaydi olusturur.
   async function newTodo(){
     if (baslik.trim() === "") return;
     try {
@@ -27,6 +30,7 @@ function App() {
     }
   }
 
+  // Tum todo verilerini backend'den alir.
   async function getData(){
     try {
       const res = await axios.get(`${API_BASE}/todos`);
@@ -47,6 +51,7 @@ function App() {
     }
   }
 
+  // Secilen todo kaydinin durum bilgisini gunceller.
   async function updateTodo(itemId, mevcutBaslik){
     if (itemId === undefined || itemId === null) return;
 
@@ -69,6 +74,7 @@ function App() {
     }
   }
 
+  // Secilen todo kaydini siler.
   async function deleteTodo(itemId){
     if (itemId === undefined || itemId === null) return;
 
@@ -81,6 +87,7 @@ function App() {
     }
   }
 
+  // Tum todo kayitlarini tek istekte siler.
   async function deleteAllTodos(){
     try {
       await axios.delete(`${API_BASE}/delete-all-data`);
@@ -91,10 +98,12 @@ function App() {
     }
   }
 
+  // Component ilk acildiginda listeyi yukler.
   useEffect(
     () => {getData()} , []
   )
 
+  // Tabloda gorunmesi icin kayitlari basliga gore siralar.
   const siraliTodos = [...todos].sort((a, b) => {
     const aTitle = (a.title ?? "").toString();
     const bTitle = (b.title ?? "").toString();
@@ -104,6 +113,7 @@ function App() {
 
   return (
     <div className="App">
+        {/* Todo olusturma alani */}
         <h1>Todo APP</h1>
         <label>todo olusuturucu</label>
         <input type="text" value={baslik} onChange={(e)=> setBaslik(e.target.value)}></input>
@@ -115,6 +125,7 @@ function App() {
 
         {hata && <p>{hata}</p>}
         
+        {/* Todo liste ve islem tablosu */}
         <div className="todo-table-wrap">
           <table className="todo-table">
             <thead>

@@ -7,10 +7,14 @@ from db.models import Todo
 
 Base.metadata.create_all(bind=engine)
 
+
+# Todo tablosu icin pydantic schema. 
 class CreateTodo(BaseModel):
     title: str
     state: bool
 
+
+# CORS ayarlari.
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -20,10 +24,12 @@ app.add_middleware(
     allow_credentials=True,
 )
 
+
+# session acip kapatan metod. (servis dependency)
 def get_db():
     db = sessionLocal()
     try:
-        yield db
+        yield db 
     finally:
         db.close()
 
@@ -31,11 +37,15 @@ def get_db():
 def root():
     return "root dizin"
 
+
+# Tum todo kayitlarini listeler.
 @app.get("/todos")
 def todos(db=Depends(get_db)):
     todos = db.query(Todo).all()
     return todos
 
+
+# Yeni bir todo kaydi ekler.
 @app.post("/todos")
 def add_todos(new_todo: CreateTodo, db=Depends(get_db)):
     add_todo = Todo(**new_todo.model_dump())
@@ -44,6 +54,7 @@ def add_todos(new_todo: CreateTodo, db=Depends(get_db)):
     return {"message": "yeni satir eklendi"}
 
 
+# Tum todo kayitlarini siler.
 @app.delete("/delete-all-data")
 def delete_data(db=Depends(get_db)):
     try:
@@ -54,6 +65,8 @@ def delete_data(db=Depends(get_db)):
 
     return {"msg": "veriler silindi"}
 
+
+# Verilen id'ye ait todo kaydini gunceller.
 @app.put("/todo-update/{request_todo_id}")
 def todo_update(
     request_todo_id: int,
@@ -69,6 +82,8 @@ def todo_update(
     db.commit()
     return "satir guncellendi"
 
+
+# Verilen id'ye ait todo kaydini siler.
 @app.delete("/todo-delete/{request_todo_id}")
 def todo_delete(request_todo_id: int, db=Depends(get_db)):
     remove_todo = db.query(Todo).filter(request_todo_id == Todo.id).first()
